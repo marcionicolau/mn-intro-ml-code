@@ -23,9 +23,9 @@ decision_tree() |>
 
 
 ## ----knn, eval=FALSE, echo=TRUE-----------------------------------------------------------------
-## nearest_neighbor() %>%
-##   set_engine("kknn") %>%
-##   set_mode("regression")
+nearest_neighbor() %>%
+  set_engine("kknn") %>%
+  set_mode("regression")
 
 
 ## ----lm_spec1-----------------------------------------------------------------------------------
@@ -35,17 +35,16 @@ lm_spec = linear_reg(
 
 
 ## ----lm_spec2, echo=TRUE, eval=FALSE------------------------------------------------------------
-## lm_spec = linear_reg() |>
-##   set_engine("lm") |>
-##   set_mode("regression") # redundante
+lm_spec = linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression") # redundante
 
 
 ## ----lm_train1, echo=TRUE, eval=FALSE-----------------------------------------------------------
-## lm(Sale_Price ~ Gr_Liv_Area, data = ames)
+lm(Sale_Price ~ Gr_Liv_Area, data = ames)
 
 
 ## ----lm_train2, warning=FALSE-------------------------------------------------------------------
-
 lm_spec %>%
   fit(Sale_Price ~Gr_Liv_Area, data = ames)
 
@@ -66,14 +65,12 @@ predict(lm_fit, new_data = ames) %>%
 
 
 ## ----lm_metrics---------------------------------------------------------------------------------
-
 predict(lm_fit, new_data = ames) %>% 
   mutate(price_truth = ames$Sale_Price) %>%
   rmse(truth = price_truth, estimate = .pred)
 
 
 ## ----lm_ames_hodout, warning=FALSE--------------------------------------------------------------
-
 set.seed(2021) # Favor NÃO esquecer!
 
 ames_split = initial_split(ames, prop = 0.8)
@@ -103,8 +100,8 @@ rt_spec %>%
 
 
 ## ----kknn, eval=FALSE, echo=TRUE----------------------------------------------------------------
-## 
-## install.packages('kknn')
+
+install.packages('kknn')
 
 
 ## ----ames_knn, warning=FALSE--------------------------------------------------------------------
@@ -149,9 +146,9 @@ dim(ames_train)
 
 
 ## ----lm_base, eval=FALSE, echo=TRUE-------------------------------------------------------------
-## lm(Sale_Price ~ Neighborhood +
-##      log10(Gr_Liv_Area) + Year_Built + Bldg_Type,
-##    data = ames)
+lm(Sale_Price ~ Neighborhood +
+     log10(Gr_Liv_Area) + Year_Built + Bldg_Type,
+   data = ames)
 
 
 ## ----lm_ames_recipes----------------------------------------------------------------------------
@@ -306,6 +303,26 @@ use_xgboost(Sale_Price ~ Neighborhood + Gr_Liv_Area +
             tune = FALSE,
             # Add comments explaining some of the code:
             verbose = TRUE)
+
+## Add in
+bag_tree_rpart_spec <-
+  baguette::bag_tree() %>%
+  set_engine('rpart') %>%
+  set_mode('regression')
+
+decision_tree_rpart_spec <-
+  decision_tree(tree_depth = tune(), min_n = tune(), cost_complexity = tune()) %>%
+  set_engine('rpart') %>%
+  set_mode('regression')
+
+linear_reg_keras_spec <-
+  linear_reg(penalty = tune()) %>%
+  set_engine('keras')
+
+linear_reg_stan_spec <-
+  linear_reg() %>%
+  set_engine('stan')
+
 
 
 ## -----------------------------------------------------------------------------------------------
